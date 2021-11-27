@@ -12,7 +12,7 @@ public class RidingCylinder : MonoBehaviour
         _value += value;
         if (_value>1)
         {
-            float leftValue = value - 1;
+            float leftValue = _value - 1;
             int cylinderCount=PlayerController.current.cylinders.Count;
             transform.localPosition = new Vector3(transform.localPosition.x, -0.5f *(cylinderCount-1)-0.25f,transform.localPosition.z);
             transform.localScale = new Vector3(0.5f,transform.localScale.y,0.5f);

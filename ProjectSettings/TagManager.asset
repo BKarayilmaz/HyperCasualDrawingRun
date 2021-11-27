@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - AddCylinder
+  - Trap
+  - SpawnBridge
+  - StopSpawnBridge
   layers:
   - Default
   - TransparentFX

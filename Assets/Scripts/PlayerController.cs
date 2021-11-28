@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,21 +22,41 @@ public class PlayerController : MonoBehaviour
 
     private float _creatingBridgeTimer;
 
+    private bool _finished;
+    private float _scoreTimer=0;
+
+    public Animator animator;
+
+    private float _lastTouchedX;
+
     // Start is called before the first frame update
     void Start()
     {
         current = this;
-        _currentRunningSpeed = runningSpeed;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (LevelController.Current==null||!LevelController.Current.gameActive)
+        {
+            return;
+        }
         float newX = 0;
         float touchXDelta=0;
-        if (Input.touchCount>0&&Input.GetTouch(0).phase==TouchPhase.Moved)
+        //if (Input.touchCount>0&&Input.GetTouch(0).phase==TouchPhase.Moved)
+        if (Input.touchCount>0)
         {
-            touchXDelta = Input.GetTouch(0).deltaPosition.x / Screen.width;
+            if(Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                _lastTouchedX = Input.GetTouch(0).position.x;
+            }else if (Input.GetTouch(0).phase == TouchPhase.Moved)
+            {
+                touchXDelta = 5*(_lastTouchedX-Input.GetTouch(0).position.x) / Screen.width;
+                _lastTouchedX = Input.GetTouch(0).position.x;
+            }
+           
         }else if (Input.GetMouseButton(0))
         {
             touchXDelta = Input.GetAxis("Mouse X");
@@ -63,8 +84,23 @@ public class PlayerController : MonoBehaviour
                 Vector3 newPiecePosition = _bridgeSpawner.startReference.transform.position + direction * characterDistance;
                 newPiecePosition.x = transform.position.x;
                 createdBridgePiece.transform.position = newPiecePosition;
+
+                if (_finished)
+                {
+                    _scoreTimer -= Time.deltaTime;
+                    if (_scoreTimer < 0)
+                    {
+                        _scoreTimer = 0.3f;
+                        LevelController.Current.ChangeScore(1);
+                    }
+                }
             }
         }
+    }
+
+    public void ChangeSpeed(float value)
+    {
+        _currentRunningSpeed = value;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -81,6 +117,15 @@ public class PlayerController : MonoBehaviour
         else if (other.tag == "StopSpawnBridge")
         {
             StopSpawningBridge();
+            if (_finished)
+            {
+                LevelController.Current.FinishGame();
+            }
+        }
+        else if (other.tag == "Finish")
+        {
+            _finished=true;
+            StartSpawningBridge(other.transform.parent.GetComponent<BridgeSpawner>());
         }
     }
     private void OnTriggerStay(Collider other)
@@ -103,12 +148,28 @@ public class PlayerController : MonoBehaviour
             else
             {
                 //Game Over
+                if (_finished)
+                {
+                    LevelController.Current.FinishGame();
+                }
+                else
+                {
+                    Die();
+                }
             }
         }
         else
         {
             cylinders[cylinders.Count - 1].IncrementCylinderVolume(value);
         }
+    }
+
+    public void Die()
+    {
+        animator.SetBool("isDead", true);
+        gameObject.layer = 6;
+        Camera.main.transform.SetParent(null);
+        LevelController.Current.GameOver();
     }
 
     public void CreateCylinder(float value)

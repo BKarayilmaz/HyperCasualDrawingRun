@@ -23,52 +23,59 @@ public class PlayerController : MonoBehaviour
     private float _creatingBridgeTimer;
 
     private bool _finished;
-    private float _scoreTimer=0;
+    private float _scoreTimer = 0;
 
     public Animator animator;
 
     private float _lastTouchedX;
 
+    public AudioSource cylinderAudioSource;
+    public AudioClip gatherAudioClip, dropAudioClip;
+    private float _dropSoundTimer;
+
     // Start is called before the first frame update
     void Start()
     {
         current = this;
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (LevelController.Current==null||!LevelController.Current.gameActive)
+        if (LevelController.Current == null || !LevelController.Current.gameActive)
         {
             return;
         }
         float newX = 0;
-        float touchXDelta=0;
+        float touchXDelta = 0;
         //if (Input.touchCount>0&&Input.GetTouch(0).phase==TouchPhase.Moved)
-        if (Input.touchCount>0)
+        if (Input.touchCount > 0)
         {
-            if(Input.GetTouch(0).phase == TouchPhase.Began)
+            if (Input.GetTouch(0).phase == TouchPhase.Began)
             {
-                _lastTouchedX = Input.GetTouch(0).position.x;
-            }else if (Input.GetTouch(0).phase == TouchPhase.Moved)
-            {
-                touchXDelta = 5*(_lastTouchedX-Input.GetTouch(0).position.x) / Screen.width;
                 _lastTouchedX = Input.GetTouch(0).position.x;
             }
-           
-        }else if (Input.GetMouseButton(0))
+            else if (Input.GetTouch(0).phase == TouchPhase.Moved)
+            {
+                touchXDelta = 5 * (_lastTouchedX - Input.GetTouch(0).position.x) / Screen.width;
+                _lastTouchedX = Input.GetTouch(0).position.x;
+            }
+
+        }
+        else if (Input.GetMouseButton(0))
         {
             touchXDelta = Input.GetAxis("Mouse X");
         }
         newX = transform.position.x + xSpeed * touchXDelta * Time.deltaTime;
         newX = Mathf.Clamp(newX, -limitX, limitX);
 
-        Vector3 newPosition = new Vector3(newX, transform.position.y, transform.position.z +_currentRunningSpeed*Time.deltaTime);
+        Vector3 newPosition = new Vector3(newX, transform.position.y, transform.position.z + _currentRunningSpeed * Time.deltaTime);
         transform.position = newPosition;
 
         if (_spawningBridge)
         {
+            PlayDropSounds();
             _creatingBridgeTimer -= Time.deltaTime;
             if (_creatingBridgeTimer < 0)
             {
@@ -107,6 +114,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.tag == "AddCylinder")
         {
+            cylinderAudioSource.PlayOneShot(gatherAudioClip, 0.1f);
             IncrementCylinderVolume(0.1f);
             Destroy(other.gameObject);
         }
@@ -124,17 +132,22 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.tag == "Finish")
         {
-            _finished=true;
+            _finished = true;
             StartSpawningBridge(other.transform.parent.GetComponent<BridgeSpawner>());
         }
     }
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Trap")
+        if (LevelController.Current.gameActive)
         {
-            IncrementCylinderVolume(-Time.fixedDeltaTime);
+            if (other.tag == "Trap")
+            {
+                PlayDropSounds();
+                IncrementCylinderVolume(-Time.fixedDeltaTime);
 
+            }
         }
+        
     }
 
     public void IncrementCylinderVolume(float value)
@@ -174,7 +187,7 @@ public class PlayerController : MonoBehaviour
 
     public void CreateCylinder(float value)
     {
-        RidingCylinder createdCylinder = Instantiate(ridingCylinderPrefab,transform).GetComponent<RidingCylinder>();
+        RidingCylinder createdCylinder = Instantiate(ridingCylinderPrefab, transform).GetComponent<RidingCylinder>();
         cylinders.Add(createdCylinder);
         createdCylinder.IncrementCylinderVolume(value);
     }
@@ -193,5 +206,15 @@ public class PlayerController : MonoBehaviour
     public void StopSpawningBridge()
     {
         _spawningBridge = false;
+    }
+
+    public void PlayDropSounds()
+    {
+        _dropSoundTimer -= Time.deltaTime;
+        if (_dropSoundTimer < 0)
+        {
+            _dropSoundTimer = 0.15f;
+            cylinderAudioSource.PlayOneShot(dropAudioClip, 0.1f);
+        }
     }
 }

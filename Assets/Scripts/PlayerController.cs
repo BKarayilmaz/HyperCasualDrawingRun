@@ -29,8 +29,8 @@ public class PlayerController : MonoBehaviour
 
     private float _lastTouchedX;
 
-    public AudioSource cylinderAudioSource;
-    public AudioClip gatherAudioClip, dropAudioClip;
+    public AudioSource cylinderAudioSource,triggerAudioSource;
+    public AudioClip gatherAudioClip, dropAudioClip,coinAudioCllip;
     private float _dropSoundTimer;
 
     // Start is called before the first frame update
@@ -134,6 +134,13 @@ public class PlayerController : MonoBehaviour
         {
             _finished = true;
             StartSpawningBridge(other.transform.parent.GetComponent<BridgeSpawner>());
+        }
+        else if (other.tag == "Coin")
+        {
+            triggerAudioSource.PlayOneShot(coinAudioCllip, 0.1f);
+            other.tag = "Untagged";
+            LevelController.Current.ChangeScore(10);
+            Destroy(other.gameObject);
         }
     }
     private void OnTriggerStay(Collider other)

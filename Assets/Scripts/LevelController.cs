@@ -10,7 +10,7 @@ public class LevelController : MonoBehaviour
     public bool gameActive = false;
 
     public GameObject startMenu, gameMenu, gameOverMenu, finishMenu;
-    public Text scoreText, finishScoreText, currentLevelText, nextLevelText;
+    public Text scoreText, finishScoreText, currentLevelText, nextLevelText,startingMenuMoneyText,gameOverMenuMoneyText, finishGameMenuMoneyText;
 
     int currentLevel;
     int score;
@@ -36,6 +36,8 @@ public class LevelController : MonoBehaviour
         {
             currentLevelText.text = (currentLevel + 1).ToString();
             nextLevelText.text = (currentLevel + 2).ToString();
+            int money = PlayerPrefs.GetInt("money");
+            startingMenuMoneyText.text = money.ToString();
         }
         gameAudioSource = Camera.main.GetComponent<AudioSource>();
     }
@@ -73,6 +75,7 @@ public class LevelController : MonoBehaviour
 
     public void GameOver()
     {
+        gameOverMenuMoneyText.text = PlayerPrefs.GetInt("money").ToString();
         gameAudioSource.Stop();
         gameAudioSource.PlayOneShot(gameOverAudioClip);
         gameMenu.SetActive(false);
@@ -82,6 +85,9 @@ public class LevelController : MonoBehaviour
 
     public void FinishGame()
     {
+        int money = PlayerPrefs.GetInt("money");
+        PlayerPrefs.SetInt("money", money + score);
+        finishGameMenuMoneyText.text = PlayerPrefs.GetInt("money").ToString();
         gameAudioSource.Stop();
         gameAudioSource.PlayOneShot(victoryAudioClip);
         PlayerPrefs.SetInt("currentLevel",currentLevel+1);

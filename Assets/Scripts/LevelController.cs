@@ -25,6 +25,8 @@ public class LevelController : MonoBehaviour
 
     int money;
 
+    public DailyReward dailyReward;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +38,7 @@ public class LevelController : MonoBehaviour
         }
         else
         {
+            dailyReward.InitializeDaiyReward();
             currentLevelText.text = (currentLevel + 1).ToString();
             nextLevelText.text = (currentLevel + 2).ToString();
             UpdateMoneyText();

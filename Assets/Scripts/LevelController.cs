@@ -32,20 +32,15 @@ public class LevelController : MonoBehaviour
     {
         Current = this;
         currentLevel = PlayerPrefs.GetInt("currentLevel");
-        if (SceneManager.GetActiveScene().name != "Level " + currentLevel)
-        {
-            SceneManager.LoadScene("Level " + currentLevel);
-        }
-        else
-        {
-            PlayerController.current = GameObject.FindObjectOfType<PlayerController>();
-            GameObject.FindObjectOfType<MarketController>().InitializeMarketController();
-            dailyReward.InitializeDaiyReward();
-            currentLevelText.text = (currentLevel + 1).ToString();
-            nextLevelText.text = (currentLevel + 2).ToString();
-            UpdateMoneyText();
-            //GiveMoneyToPlayer(3000);
-        }
+
+        PlayerController.current = GameObject.FindObjectOfType<PlayerController>();
+        GameObject.FindObjectOfType<MarketController>().InitializeMarketController();
+        dailyReward.InitializeDaiyReward();
+        currentLevelText.text = (currentLevel + 1).ToString();
+        nextLevelText.text = (currentLevel + 2).ToString();
+        UpdateMoneyText();
+        //GiveMoneyToPlayer(3000);
+
         gameAudioSource = Camera.main.GetComponent<AudioSource>();
     }
 
@@ -72,12 +67,12 @@ public class LevelController : MonoBehaviour
 
     public void RestartLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        LevelLoader.Current.ChangeLevel(SceneManager.GetActiveScene().name);
     }
 
     public void LoadNextLevel()
     {
-        SceneManager.LoadScene("Level " + (currentLevel + 1));
+        LevelLoader.Current.ChangeLevel("Level " + (currentLevel + 1));
     }
 
     public void GameOver()

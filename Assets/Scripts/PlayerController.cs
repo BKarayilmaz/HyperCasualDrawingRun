@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (Input.GetTouch(0).phase == TouchPhase.Moved)
             {
-                touchXDelta = 5 * (_lastTouchedX - Input.GetTouch(0).position.x) / Screen.width;
+                touchXDelta = 5 * (Input.GetTouch(0).position.x - _lastTouchedX) / Screen.width;
                 _lastTouchedX = Input.GetTouch(0).position.x;
             }
 
@@ -83,7 +83,8 @@ public class PlayerController : MonoBehaviour
             {
                 _creatingBridgeTimer = 0.01f;
                 IncrementCylinderVolume(-0.01f);
-                GameObject createdBridgePiece = Instantiate(bridgePiece);
+                GameObject createdBridgePiece = Instantiate(bridgePiece,this.transform);
+                createdBridgePiece.transform.SetParent(null);
                 Vector3 direction = _bridgeSpawner.endReference.transform.position - _bridgeSpawner.startReference.transform.position;
                 float distance = direction.magnitude;
                 direction = direction.normalized;

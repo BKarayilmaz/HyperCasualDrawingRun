@@ -38,10 +38,13 @@ public class LevelController : MonoBehaviour
         }
         else
         {
+            PlayerController.current = GameObject.FindObjectOfType<PlayerController>();
+            GameObject.FindObjectOfType<MarketController>().InitializeMarketController();
             dailyReward.InitializeDaiyReward();
             currentLevelText.text = (currentLevel + 1).ToString();
             nextLevelText.text = (currentLevel + 2).ToString();
             UpdateMoneyText();
+            //GiveMoneyToPlayer(3000);
         }
         gameAudioSource = Camera.main.GetComponent<AudioSource>();
     }
@@ -116,8 +119,8 @@ public class LevelController : MonoBehaviour
     public void GiveMoneyToPlayer(int increment)
     {
         money = PlayerPrefs.GetInt("money");
-        money = Mathf.Max(0,money + increment);
-        PlayerPrefs.SetInt("money", money );
+        money = Mathf.Max(0, money + increment);
+        PlayerPrefs.SetInt("money", money);
         UpdateMoneyText();
     }
 }

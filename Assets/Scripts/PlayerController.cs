@@ -29,16 +29,18 @@ public class PlayerController : MonoBehaviour
 
     private float _lastTouchedX;
 
-    public AudioSource cylinderAudioSource,triggerAudioSource;
-    public AudioClip gatherAudioClip, dropAudioClip,coinAudioCllip;
+    public AudioSource cylinderAudioSource,triggerAudioSource,itemAudioSource;
+    public AudioClip gatherAudioClip, dropAudioClip,coinAudioCllip, buyAudioCllip,equipAudioClip, unequipAudioClip;
     private float _dropSoundTimer;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        current = this;
+    public List<GameObject> wearSpots;
 
-    }
+    //// Start is called before the first frame update
+    //void Start()
+    //{
+    //    current = this;
+
+    //}
 
     // Update is called once per frame
     void Update()
